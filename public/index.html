@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediCare - Hospital Patient & Appointment Management System</title>
+  <meta name="description" content="Next-gen Healthcare SaaS and Hospital DBMS Dashboard with live SQL JOINs, Subqueries, and ACID Transaction Billing.">
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+            <path d="M12 5v14"/>
+            <path d="M5 12h14"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h2>MediCare<span>OS</span></h2>
+          <p>Hospital DBMS & SaaS</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="tab-patients">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Overview & Patients</span>
+        </button>
+
+        <button class="nav-item" data-tab="tab-doctors">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/>
+            <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/>
+            <circle cx="20" cy="10" r="2"/>
+          </svg>
+          <span>Doctors & Depts</span>
+        </button>
+
+        <button class="nav-item" data-tab="tab-appointments">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+            <line x1="16" x2="16" y1="2" y2="6"/>
+            <line x1="8" x2="8" y1="2" y2="6"/>
+            <line x1="3" x2="21" y1="10" y2="10"/>
+            <path d="m9 16 2 2 4-4"/>
+          </svg>
+          <span>Appointments</span>
+          <span class="badge-counter" id="badge-scheduled-count">0</span>
+        </button>
+
+        <button class="nav-item" data-tab="tab-billing">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="20" height="14" x="2" y="5" rx="2"/>
+            <line x1="2" x2="22" y1="10" y2="10"/>
+            <line x1="6" x2="10" y1="15" y2="15"/>
+          </svg>
+          <span>Billing & Transactions</span>
+        </button>
+
+        <div class="nav-divider"></div>
+        <div class="nav-section-title">ACADEMIC & EVALUATION</div>
+
+        <button class="nav-item nav-item-accent" data-tab="tab-dbms">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="5" rx="9" ry="3"/>
+            <path d="M3 5V19A9 3 0 0 0 21 19V5"/>
+            <path d="M3 12A9 3 0 0 0 21 12"/>
+          </svg>
+          <span>DBMS & CO1-CO5</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-status-card">
+          <div class="status-indicator">
+            <span class="pulse-dot" id="system-dot"></span>
+            <span class="status-text" id="system-status-label">Checking Backend...</span>
+          </div>
+          <p class="status-sub" id="system-subtext">Port 8080 · MySQL 8.0</p>
+          <button class="btn-mode-toggle" id="btn-toggle-mode" title="Toggle between Live Java Backend and Cloud Demo Mode">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+            <span id="btn-toggle-mode-text">Switch to Demo Mode</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <main class="main-content">
+      <!-- TOP STATUS BAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="breadcrumb">
+            <span class="crumb-root">Hospital Management</span>
+            <span class="crumb-separator">/</span>
+            <span class="crumb-active" id="active-breadcrumb-title">Overview & Patients</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="live-badge" id="live-connection-badge">
+            <span class="live-badge-dot"></span>
+            <span class="live-badge-text" id="badge-mode-text">Connecting...</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="btn-refresh-all" title="Reload live data from database">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+            <span>Refresh</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- KPI METRIC CARDS ROW -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon icon-blue">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="kpi-content">
+            <span class="kpi-label">Total Patients</span>
+            <h3 class="kpi-value" id="kpi-patients-count">0</h3>
+            <span class="kpi-hint">Primary records in Patient table</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon icon-emerald">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>
+          </div>
+          <div class="kpi-content">
+            <span class="kpi-label">Active Doctors</span>
+            <h3 class="kpi-value" id="kpi-doctors-count">0</h3>
+            <span class="kpi-hint">Mapped across Departments</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon icon-indigo">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
+          </div>
+          <div class="kpi-content">
+            <span class="kpi-label">Scheduled Appts</span>
+            <h3 class="kpi-value" id="kpi-scheduled-count">0</h3>
+            <span class="kpi-hint">Pending consultations</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon icon-purple">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="kpi-content">
+            <span class="kpi-label">Total Revenue</span>
+            <h3 class="kpi-value" id="kpi-total-revenue">Rs. 0</h3>
+            <span class="kpi-hint" id="kpi-revenue-subtext">SQL SUM(amount) Aggregation</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 1: PATIENTS & REGISTRATION -->
+      <section class="tab-pane active" id="tab-patients">
+        <div class="grid-2-col">
+          <!-- Register Form -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Register New Patient</h3>
+                <p>Inserts clean verified record into MySQL Patient table</p>
+              </div>
+              <span class="badge badge-primary">INSERT DML</span>
+            </div>
+            <form id="form-patient" class="styled-form">
+              <div class="form-group">
+                <label for="p-name">Full Name <span class="req">*</span></label>
+                <input type="text" id="p-name" placeholder="e.g. Aarav Sharma" required>
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="p-age">Age (1 - 120) <span class="req">*</span></label>
+                  <input type="number" id="p-age" min="1" max="120" placeholder="e.g. 32" required>
+                </div>
+                <div class="form-group">
+                  <label for="p-gender">Gender <span class="req">*</span></label>
+                  <select id="p-gender" required>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="p-phone">Phone Number (Unique) <span class="req">*</span></label>
+                <input type="tel" id="p-phone" placeholder="e.g. 9876543210" required>
+              </div>
+              <div class="form-group">
+                <label for="p-address">Address <span class="req">*</span></label>
+                <textarea id="p-address" rows="2" placeholder="e.g. Flat 402, Lotus Towers, Pune" required></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="btn-save-patient">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                  <span>Save Patient</span>
+                </button>
+                <button type="reset" class="btn btn-secondary">Clear</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Patient Directory & Search -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Patient Directory</h3>
+                <p>Real-time SELECT query on Patient table</p>
+              </div>
+              <div class="search-box">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" id="patient-search-input" placeholder="Search by ID (e.g. 1) or Name...">
+                <button type="button" class="btn-clear-search" id="btn-clear-patient-search" title="Clear search">✕</button>
+              </div>
+            </div>
+            <div class="table-container">
+              <table class="data-table" id="patients-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Patient Name</th>
+                    <th>Age / Gender</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                  </tr>
+                </thead>
+                <tbody id="patients-tbody">
+                  <tr><td colspan="5" class="loading-cell">Loading patient records...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: DOCTORS & DEPARTMENTS -->
+      <section class="tab-pane" id="tab-doctors">
+        <div class="grid-2-col">
+          <!-- Add Doctor Form -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Register Specialist / Doctor</h3>
+                <p>Foreign Key reference to Department table</p>
+              </div>
+              <span class="badge badge-primary">FK Constraint</span>
+            </div>
+            <form id="form-doctor" class="styled-form">
+              <div class="form-group">
+                <label for="doc-name">Doctor Name <span class="req">*</span></label>
+                <input type="text" id="doc-name" placeholder="e.g. Dr. Amit Shah" required>
+              </div>
+              <div class="form-group">
+                <label for="doc-spec">Specialization <span class="req">*</span></label>
+                <input type="text" id="doc-spec" placeholder="e.g. Interventional Cardiology" required>
+              </div>
+              <div class="form-group">
+                <label for="doc-phone">Phone Number (Unique) <span class="req">*</span></label>
+                <input type="tel" id="doc-phone" placeholder="e.g. 9820011223" required>
+              </div>
+              <div class="form-group">
+                <label for="doc-dept">Department <span class="req">*</span></label>
+                <select id="doc-dept" required>
+                  <option value="">Loading departments...</option>
+                </select>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="btn-save-doctor">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+                  <span>Add Doctor</span>
+                </button>
+                <button type="reset" class="btn btn-secondary">Clear</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Doctors Joined with Department Table -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Medical Staff Directory</h3>
+                <p>Doctor ⨝ Department (SQL INNER JOIN)</p>
+              </div>
+              <span class="badge badge-info">2-Table JOIN</span>
+            </div>
+            <div class="table-container">
+              <table class="data-table" id="doctors-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Doctor Name</th>
+                    <th>Specialization</th>
+                    <th>Phone</th>
+                    <th>Department</th>
+                  </tr>
+                </thead>
+                <tbody id="doctors-tbody">
+                  <tr><td colspan="5" class="loading-cell">Loading doctor records...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: APPOINTMENTS -->
+      <section class="tab-pane" id="tab-appointments">
+        <div class="grid-2-col">
+          <!-- Book Appointment Form -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Schedule New Appointment</h3>
+                <p>Enforces UNIQUE (doctor_id, date, time) slot constraint</p>
+              </div>
+              <span class="badge badge-indigo">Composite Constraint</span>
+            </div>
+            <form id="form-appointment" class="styled-form">
+              <div class="form-group">
+                <label for="appt-patient">Select Patient <span class="req">*</span></label>
+                <select id="appt-patient" required>
+                  <option value="">Choose a patient...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="appt-doctor">Select Doctor <span class="req">*</span></label>
+                <select id="appt-doctor" required>
+                  <option value="">Choose a doctor...</option>
+                </select>
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="appt-date">Date <span class="req">*</span></label>
+                  <input type="date" id="appt-date" required>
+                </div>
+                <div class="form-group">
+                  <label for="appt-time">Time (HH:MM) <span class="req">*</span></label>
+                  <input type="time" id="appt-time" value="10:30" required>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="btn-book-appt">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
+                  <span>Book Appointment</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Appointments List with Status Quick-Updater -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Appointments Schedule</h3>
+                <p>Appointment ⨝ Patient ⨝ Doctor (3-Table JOIN)</p>
+              </div>
+              <span class="badge badge-purple">3-Table JOIN</span>
+            </div>
+            <div class="table-container">
+              <table class="data-table" id="appointments-table">
+                <thead>
+                  <tr>
+                    <th>Appt ID</th>
+                    <th>Patient</th>
+                    <th>Doctor & Spec</th>
+                    <th>Schedule</th>
+                    <th>Status Action</th>
+                  </tr>
+                </thead>
+                <tbody id="appointments-tbody">
+                  <tr><td colspan="5" class="loading-cell">Loading appointments...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: BILLING & ACID TRANSACTIONS -->
+      <section class="tab-pane" id="tab-billing">
+        <!-- Billing KPI Sub-Banner -->
+        <div class="billing-summary-banner">
+          <div class="billing-stat-item">
+            <span class="bstat-label">Total Generated Invoices</span>
+            <span class="bstat-val" id="bill-stat-total-count">0</span>
+          </div>
+          <div class="billing-stat-item">
+            <span class="bstat-label">Total Billed Revenue</span>
+            <span class="bstat-val" id="bill-stat-total-amount">Rs. 0.00</span>
+          </div>
+          <div class="billing-stat-item">
+            <span class="bstat-label">Paid & Settled Revenue</span>
+            <span class="bstat-val text-success" id="bill-stat-paid-amount">Rs. 0.00</span>
+          </div>
+          <div class="billing-stat-item">
+            <span class="bstat-label">Average Invoice</span>
+            <span class="bstat-val" id="bill-stat-avg-amount">Rs. 0.00</span>
+          </div>
+        </div>
+
+        <div class="grid-2-col">
+          <!-- Generate Bill Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Generate Bill (Subquery Demo)</h3>
+                <p>Lists appointments NOT IN (SELECT appointment_id FROM Bill)</p>
+              </div>
+              <span class="badge badge-amber">Nested Subquery</span>
+            </div>
+            <form id="form-generate-bill" class="styled-form">
+              <div class="form-group">
+                <label for="bill-unbilled-select">Unbilled Appointment <span class="req">*</span></label>
+                <select id="bill-unbilled-select" required>
+                  <option value="">Select an unbilled appointment...</option>
+                </select>
+                <small class="form-help">Only appointments without an existing bill are queried.</small>
+              </div>
+              <div class="form-group">
+                <label for="bill-amount">Invoice Amount (Rs.) <span class="req">*</span></label>
+                <input type="number" id="bill-amount" min="100" step="50" value="1200.00" required>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="btn-create-bill">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  <span>Generate Bill</span>
+                </button>
+              </div>
+            </form>
+
+            <div class="card-divider"></div>
+
+            <!-- Manual Transaction Pay Box -->
+            <div class="direct-pay-box">
+              <h4>Quick Bill Payment by ID (ACID Transaction)</h4>
+              <div class="input-action-row">
+                <input type="number" id="manual-bill-id" placeholder="Enter Bill ID (e.g. 2)">
+                <button type="button" class="btn btn-success" id="btn-manual-pay">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Execute Pay & Complete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ACID Theory & Workflow Visualizer -->
+          <div class="card acid-info-card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>ACID Transaction Architecture</h3>
+                <p>Course Outcome 4 (CO4): Transaction Control Language (TCL)</p>
+              </div>
+              <span class="badge badge-success">TCL / ACID</span>
+            </div>
+            <div class="acid-steps-container">
+              <div class="acid-step">
+                <div class="step-num">1</div>
+                <div class="step-desc">
+                  <strong>Disable Auto-Commit</strong>
+                  <code>con.setAutoCommit(false);</code>
+                  <p>Guarantees transaction boundary starts cleanly.</p>
+                </div>
+              </div>
+              <div class="acid-step">
+                <div class="step-num">2</div>
+                <div class="step-desc">
+                  <strong>Update Bill Status</strong>
+                  <code>UPDATE Bill SET payment_status = 'Paid' WHERE bill_id = ?</code>
+                  <p>Transitions payment from Pending to Paid.</p>
+                </div>
+              </div>
+              <div class="acid-step">
+                <div class="step-num">3</div>
+                <div class="step-desc">
+                  <strong>Update Linked Appointment</strong>
+                  <code>UPDATE Appointment SET status = 'Completed' WHERE appointment_id = ?</code>
+                  <p>Atomically synchronizes medical workflow.</p>
+                </div>
+              </div>
+              <div class="acid-step">
+                <div class="step-num">4</div>
+                <div class="step-desc">
+                  <strong>Commit or Rollback</strong>
+                  <code>con.commit(); // on error: con.rollback();</code>
+                  <p>All-or-nothing guarantee preserves financial integrity.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Billing Ledger Table -->
+        <div class="card" style="margin-top: 1.5rem;">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>Hospital Billing Ledger</h3>
+              <p>Bill ⨝ Appointment ⨝ Patient ⨝ Doctor (4-Table JOIN)</p>
+            </div>
+            <span class="badge badge-purple">4-Table JOIN</span>
+          </div>
+          <div class="table-container">
+            <table class="data-table" id="bills-table">
+              <thead>
+                <tr>
+                  <th>Bill ID</th>
+                  <th>Appt ID</th>
+                  <th>Patient Name</th>
+                  <th>Doctor</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                  <th>Payment Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="bills-tbody">
+                <tr><td colspan="8" class="loading-cell">Loading billing records...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: DBMS ARCHITECTURE & CO1-CO5 SHOWCASE -->
+      <section class="tab-pane" id="tab-dbms">
+        <!-- CO1 - CO5 Overview Grid -->
+        <div class="co-header-banner">
+          <h2>MediCare DBMS Curriculum & Course Outcome Mapping (CO1 - CO5)</h2>
+          <p>This technical showcase maps every module, relational schema, SQL construct, and transaction control mechanism implemented in MediCare directly to the academic university syllabus.</p>
+        </div>
+
+        <div class="co-cards-grid">
+          <!-- CO1 -->
+          <div class="co-card">
+            <div class="co-badge">CO1</div>
+            <h3>Relational Data Modeling & ER Design</h3>
+            <p>Formal Entity-Relationship diagram, identifying Entities, Attributes, Relationships, Primary Keys, and Foreign Keys across hospital departments.</p>
+            <div class="co-tags">
+              <span>ER Diagram</span>
+              <span>Primary Keys</span>
+              <span>1:N & 1:1 Relations</span>
+            </div>
+          </div>
+
+          <!-- CO2 -->
+          <div class="co-card">
+            <div class="co-badge">CO2</div>
+            <h3>DDL & Integrity Constraints</h3>
+            <p>Strict schema enforcement with <code>AUTO_INCREMENT</code>, <code>NOT NULL</code>, <code>UNIQUE</code>, <code>CHECK (age > 0)</code>, and <code>ON DELETE RESTRICT ON UPDATE CASCADE</code>.</p>
+            <div class="co-tags">
+              <span>Domain Integrity</span>
+              <span>Referential Integrity</span>
+              <span>CHECK Constraints</span>
+            </div>
+          </div>
+
+          <!-- CO3 -->
+          <div class="co-card">
+            <div class="co-badge">CO3</div>
+            <h3>Advanced SQL & Relational Algebra</h3>
+            <p>Complex 3-Table and 4-Table <code>INNER JOIN</code>s, <code>GROUP BY ... HAVING</code> analytics, and Nested Subqueries (<code>NOT IN</code> for unbilled appointments).</p>
+            <div class="co-tags">
+              <span>Multi-Table JOINs</span>
+              <span>Nested Subqueries</span>
+              <span>GROUP BY / HAVING</span>
+            </div>
+          </div>
+
+          <!-- CO4 -->
+          <div class="co-card">
+            <div class="co-badge">CO4</div>
+            <h3>Transaction Management & ACID (TCL)</h3>
+            <p>Demonstration of ACID properties via JDBC <code>setAutoCommit(false)</code>, synchronized multi-table updates, and atomic <code>commit()</code> with exception <code>rollback()</code>.</p>
+            <div class="co-tags">
+              <span>START TRANSACTION</span>
+              <span>COMMIT</span>
+              <span>ROLLBACK</span>
+              <span>Atomicity</span>
+            </div>
+          </div>
+
+          <!-- CO5 -->
+          <div class="co-card">
+            <div class="co-badge">CO5</div>
+            <h3>Database Normalization & Security</h3>
+            <p>Normalized up to BCNF/3NF eliminating insertion, deletion, and update anomalies. Role-based Database Access Control with <code>GRANT / REVOKE</code> DCL scripts.</p>
+            <div class="co-tags">
+              <span>3NF / BCNF</span>
+              <span>Lossless Join</span>
+              <span>DCL (GRANT/REVOKE)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ER Schema Architecture Section -->
+        <div class="card" style="margin-top: 1.5rem;">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>5-Table Relational Schema & Cardinality Architecture</h3>
+              <p>Relational schema representation of the hospital database</p>
+            </div>
+            <span class="badge badge-info">Normalized Relational Model</span>
+          </div>
+          <div class="er-visual-container">
+            <div class="er-table-box">
+              <div class="er-table-title">Department</div>
+              <ul class="er-attr-list">
+                <li class="pk"><span class="key-type">PK</span> department_id <em>INT</em></li>
+                <li>department_name <em>VARCHAR(50) UNIQUE</em></li>
+              </ul>
+            </div>
+
+            <div class="er-rel-arrow">1 : N ➔</div>
+
+            <div class="er-table-box">
+              <div class="er-table-title">Doctor</div>
+              <ul class="er-attr-list">
+                <li class="pk"><span class="key-type">PK</span> doctor_id <em>INT</em></li>
+                <li>doctor_name <em>VARCHAR(60)</em></li>
+                <li>specialization <em>VARCHAR(50)</em></li>
+                <li>phone <em>VARCHAR(15) UNIQUE</em></li>
+                <li class="fk"><span class="key-type">FK</span> department_id <em>INT</em></li>
+              </ul>
+            </div>
+
+            <div class="er-rel-arrow">1 : N ➔</div>
+
+            <div class="er-table-box highlight">
+              <div class="er-table-title">Appointment</div>
+              <ul class="er-attr-list">
+                <li class="pk"><span class="key-type">PK</span> appointment_id <em>INT</em></li>
+                <li class="fk"><span class="key-type">FK</span> patient_id <em>INT</em></li>
+                <li class="fk"><span class="key-type">FK</span> doctor_id <em>INT</em></li>
+                <li>appointment_date <em>DATE</em></li>
+                <li>appointment_time <em>TIME</em></li>
+                <li>status <em>CHECK ('Scheduled','Completed','Cancelled')</em></li>
+              </ul>
+            </div>
+
+            <div class="er-rel-arrow">1 : 1 ➔</div>
+
+            <div class="er-table-box">
+              <div class="er-table-title">Bill</div>
+              <ul class="er-attr-list">
+                <li class="pk"><span class="key-type">PK</span> bill_id <em>INT</em></li>
+                <li class="fk"><span class="key-type">FK/UQ</span> appointment_id <em>INT UNIQUE</em></li>
+                <li>amount <em>DECIMAL(10,2) CHECK >= 0</em></li>
+                <li>payment_status <em>CHECK ('Pending','Paid')</em></li>
+                <li>bill_date <em>DATE</em></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- SQL Code Inspector -->
+        <div class="card" style="margin-top: 1.5rem;">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>Active SQL Query Repository (Used in Live Backend)</h3>
+              <p>Reference copy of the queries powering the REST endpoints</p>
+            </div>
+            <span class="badge badge-primary">SQL Repository</span>
+          </div>
+          <div class="sql-accordion">
+            <details class="sql-item" open>
+              <summary><strong>A. 3-Table INNER JOIN (Appointments with Patient & Doctor details)</strong></summary>
+              <pre><code>SELECT A.appointment_id, P.patient_name, D.doctor_name, D.specialization,
+       A.appointment_date, A.appointment_time, A.status
+FROM Appointment A
+JOIN Patient P ON A.patient_id = P.patient_id
+JOIN Doctor D ON A.doctor_id = D.doctor_id
+ORDER BY A.appointment_id DESC;</code></pre>
+            </details>
+
+            <details class="sql-item">
+              <summary><strong>B. 4-Table INNER JOIN (Hospital Billing Ledger)</strong></summary>
+              <pre><code>SELECT B.bill_id, B.appointment_id, P.patient_name, D.doctor_name,
+       B.amount, B.payment_status, B.bill_date
+FROM Bill B
+JOIN Appointment A ON B.appointment_id = A.appointment_id
+JOIN Patient P ON A.patient_id = P.patient_id
+JOIN Doctor D ON A.doctor_id = D.doctor_id
+ORDER BY B.bill_id DESC;</code></pre>
+            </details>
+
+            <details class="sql-item">
+              <summary><strong>C. Nested Subquery (Unbilled Appointments for Billing Form)</strong></summary>
+              <pre><code>SELECT A.appointment_id, P.patient_name, D.doctor_name, A.appointment_date
+FROM Appointment A
+JOIN Patient P ON A.patient_id = P.patient_id
+JOIN Doctor D ON A.doctor_id = D.doctor_id
+WHERE A.appointment_id NOT IN (
+    SELECT appointment_id FROM Bill
+)
+ORDER BY A.appointment_id;</code></pre>
+            </details>
+
+            <details class="sql-item">
+              <summary><strong>D. Aggregate Functions (Hospital Revenue Summary)</strong></summary>
+              <pre><code>SELECT COUNT(*) AS total_bills,
+       IFNULL(SUM(amount), 0) AS total_revenue,
+       IFNULL(AVG(amount), 0) AS avg_bill,
+       COUNT(CASE WHEN payment_status = 'Paid' THEN 1 END) AS paid_bills,
+       IFNULL(SUM(CASE WHEN payment_status = 'Paid' THEN amount ELSE 0 END), 0) AS paid_revenue
+FROM Bill;</code></pre>
+            </details>
+
+            <details class="sql-item">
+              <summary><strong>E. ACID Transaction (TCL - Atomicity for Payment & Completion)</strong></summary>
+              <pre><code>-- Equivalent JDBC logic in WebServer.java:
+START TRANSACTION;
+UPDATE Bill SET payment_status = 'Paid' WHERE bill_id = ?;
+UPDATE Appointment SET status = 'Completed' WHERE appointment_id = ?;
+COMMIT; -- If any statement fails: ROLLBACK;</code></pre>
+            </details>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- JavaScript -->
+  <script src="app.js"></script>
+</body>
+</html>
